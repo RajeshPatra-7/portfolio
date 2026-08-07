@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kali Portfolio Desktop</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Fira Code','Courier New',monospace; user-select:none; }
+html,body { height:100%; overflow:hidden; }
+
+#desktop {
+    height:100vh; width:100vw;
+    background: url('wallpaper.jpg') center/cover no-repeat,
+                linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+    position:relative;
+}
+
+/* ============ DESKTOP-ONLY GATE ============ */
+#mobile-gate { display:none; position:fixed; inset:0; z-index:99999; background:#000; color:#00ff41; text-align:center; align-items:center; justify-content:center; font-family:monospace; }
+#mobile-gate.show { display:flex; }
+.gate-box { border:1px solid #00ff41; border-radius:14px; padding:45px 35px; background:#0d0d0d; box-shadow:0 0 45px rgba(0,255,65,.18); max-width:420px; margin:20px; }
+.gate-icon { font-size:70px; display:block; margin-bottom:10px; }
+.gate-box h2 { font-size:26px; margin-bottom:10px; color:#ffcc00; }
+.gate-box p { font-size:14px; line-height:1.8; }
+#gate-force { margin-top:22px; background:#00ff41; color:#000; border:none; padding:11px 24px; font-size:14px; font-weight:bold; border-radius:6px; cursor:pointer; }
+#gate-force:hover { filter:brightness(1.2); }
+
+/* ============ WARNING SCREEN ============ */
+#warning-screen {
+    position:fixed; inset:0; z-index:100000;
+    background:rgba(0,0,0,.92);
+    display:flex; align-items:center; justify-content:center;
+    animation: vibrate 0.3s ease-in-out 4;
+    cursor:pointer;
+}
+#warning-screen.hidden { display:none; }
+
+@keyframes vibrate {
+    0%,100% { transform:translate(0); }
+    10% { transform:translate(-5px,3px); }
+    20% { transform:translate(5px,-3px); }
+    30% { transform:translate(-3px,5px); }
+    40% { transform:translate(3px,-5px); }
+    50% { transform:translate(-5px,-3px); }
+    60% { transform:translate(5px,3px); }
+    70% { transform:translate(-3px,-5px); }
+    80% { transform:translate(3px,5px); }
+    90% { transform:translate(-5px,3px); }
+}
+
+.warning-box {
+    text-align:center; max-width:500px; padding:35px;
+    border:2px solid #ff5555; border-radius:14px;
+    background:#0d0d0d; box-shadow:0 0 60px rgba(255,85,85,.25);
+}
+.warning-box img { width:120px; height:120px; margin-bottom:12px; filter:drop-shadow(0 0 15px rgba(255,85,85,.5)); }
+.warning-box h2 { color:#ff5555; font-size:28px; margin-bottom:8px; }
+.warning-box p { color:#ffcc00; font-size:14px; line-height:1.7; }
+.warning-box .dim-text { color:#888; font-size:12px; margin-top:12px; }
+.warning-box #warn-enter {
+    margin-top:20px; background:#ff5555; color:#fff; border:none;
+    padding:12px 30px; font-size:14px; font-weight:bold; border-radius:6px; cursor:pointer;
+}
+.warning-box #warn-enter:hover { background:#ff7777; }
+
+/* ============ APP ICONS (Clean hover) ============ */
+#icons { position:absolute; top:0; left:0; bottom:40px; display:flex; flex-direction:column; flex-wrap:wrap; align-content:flex-start; padding:15px; gap:12px; }
+
+.icon {
+    width:92px; text-align:center; cursor:pointer; padding:10px 4px; border-radius:8px;
+    color:#fff; text-shadow:1px 1px 3px #000;
+    transition: transform .15s, background .15s, box-shadow .15s;
+}
+.icon:hover {
+    transform:scale(1.12);
+    background:rgba(0,255,65,.15);
+    box-shadow:0 0 20px rgba(0,255,65,.35);
+    text-shadow:0 0 10px rgba(0,255,65,.7);
+}
+.icon:active { transform:scale(.92); }
+.icon .ico { font-size:40px; display:block; margin-bottom:5px; filter:drop-shadow(2px 3px 4px rgba(0,0,0,.8)); }
+.icon .lbl { font-size:12px; font-weight:bold; }
+
+/* ============ WINDOWS ============ */
+.window { position:absolute; background:#0d0d0d; border:1px solid #00ff41; border-radius:10px; box-shadow:0 12px 35px rgba(0,0,0,.7); display:flex; flex-direction:column; overflow:hidden; }
+.window .titlebar { background:#161616; color:#00ff41; padding:8px 10px; display:flex; align-items:center; cursor:move; border-bottom:1px solid #00ff41; font-size:13px; }
+.window .title { flex:1; font-weight:bold; }
+.window .btn-wrap { display:flex; gap:4px; }
+.window .btn { width:20px; height:20px; border-radius:50%; border:none; cursor:pointer; font-size:11px; line-height:20px; text-align:center; color:#000; font-weight:bold; }
+.btn.close { background:#ff5555; }
+.btn.min { background:#ffbd2e; }
+.btn.close:hover { background:#ff7777; }
+.btn.min:hover { background:#ffd766; }
+.window .content { flex:1; overflow:auto; padding:14px; color:#00ff00; font-size:13px; line-height:1.6; }
+.content.term-content { padding:0; display:flex; }
+.content h3 { color:#ffcc00; margin-bottom:8px; }
+.content .k { color:#569cd6; }
+.content .v { color:#00ff00; }
+
+/* ============ TERMINAL ============ */
+.term { flex:1; display:flex; flex-direction:column; min-height:0; }
+.term-out { flex:1; overflow-y:auto; padding:10px; font-size:13px; line-height:1.5; }
+.term-in { display:flex; align-items:center; padding:8px 10px; background:#0a0a0a; border-top:1px solid #00ff41; }
+.term-in .prompt { color:#00ff41; font-weight:bold; margin-right:8px; white-space:nowrap; }
+.term-cmd { flex:1; background:transparent; border:none; outline:none; color:#00ff41; font-size:13px; caret-color:#00ff41; }
+.highlight { color:#ffcc00; font-weight:bold; }
+.red-text { color:#ff5555; }
+.blue-text { color:#569cd6; }
+.pink-text { color:#ff79c6; }
+.dim-text { color:#888; }
+.green-text { color:#00ff41; }
+.ascii { color:#ff5555; white-space:pre; line-height:1.2; font-size:11px; }
+.hack-out { flex:1; overflow:auto; padding:10px; color:#00ff41; font-size:13px; white-space:pre-wrap; word-break:break-all; }
+
+/* ============ FIRBOX (BROWSER) ============ */
+.browser-bar {
+    display:flex; align-items:center; gap:8px; padding:8px 10px;
+    background:#161616; border-bottom:1px solid #333;
+}
+.browser-nav { color:#aaa; font-size:16px; cursor:default; }
+.browser-url {
+    flex:1; background:#0a0a0a; border:1px solid #333; border-radius:20px;
+    padding:5px 14px; color:#00ff41; font-size:12px;
+}
+.browser-content { flex:1; overflow:auto; padding:15px; }
+
+/* ============ FILES / PHOTOS ============ */
+.f-item { cursor:pointer; padding:4px 8px; border-radius:4px; transition:background .12s; }
+.f-item:hover { background:#1a1a1a; color:#ffcc00; }
+.photo-grid { display:flex; flex-wrap:wrap; gap:12px; padding:10px; }
+.photo-item {
+    width:130px; height:100px; border:1px solid #00ff41; border-radius:6px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:#111; cursor:pointer; transition:transform .12s, box-shadow .12s;
+    padding:6px; text-align:center;
+}
+.photo-item:hover { transform:scale(1.05); box-shadow:0 0 15px rgba(0,255,65,.3); }
+.photo-icon { font-size:36px; }
+.photo-name { font-size:11px; color:#aaa; margin-top:4px; word-break:break-all; }
+.photo-preview {
+    position:fixed; inset:0; z-index:20000; background:rgba(0,0,0,.93);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.photo-preview.hidden { display:none; }
+
+/* ============ DOT SCROLLBAR ============ */
+::-webkit-scrollbar { width:8px; }
+::-webkit-scrollbar-track { background:rgba(0,255,65,.06); border-radius:50px; }
+::-webkit-scrollbar-thumb {
+    background:#00ff41;
+    border:2px solid #0d0d0d;
+    border-radius:50%;
+    min-height:22px;
+}
+::-webkit-scrollbar-thumb:hover { background:#7dffa8; }
+* { scrollbar-width:thin; scrollbar-color:#00ff41 rgba(0,255,65,.06); }
+
+/* ============ TASKBAR ============ */
+#taskbar { position:fixed; bottom:0; left:0; right:0; height:40px; background:rgba(18,18,18,.93); border-top:1px solid #333; display:flex; align-items:center; padding:0 10px; z-index:9999; }
+#start { background:#00ff41; color:#000; font-weight:bold; border:none; padding:6px 14px; border-radius:5px; cursor:pointer; font-size:13px; }
+#tasks { flex:1; display:flex; gap:6px; margin-left:10px; overflow-x:auto; }
+#tasks button { background:#222; color:#aaa; border:1px solid #444; border-radius:5px; padding:4px 12px; cursor:pointer; font-size:12px; white-space:nowrap; }
+#tasks button.active { background:#00ff41; color:#000; border-color:#00ff41; }
+#clock { color:#aaa; font-size:12px; margin-left:10px; white-space:nowrap; }
+
+#startmenu { position:fixed; bottom:46px; left:10px; background:#161616; border:1px solid #00ff41; border-radius:8px; padding:8px; z-index:10000; display:none; min-width:160px; }
+#startmenu button { display:block; width:100%; background:none; border:none; color:#00ff41; text-align:left; padding:8px 10px; cursor:pointer; font-size:13px; border-radius:5px; }
+#startmenu button:hover { background:#00ff41; color:#000; }
+</style>
+</head>
+<body>
+
+<!-- WARNING SCREEN -->
+<div id="warning-screen">
+    <div class="warning-box" onclick="event.stopPropagation()">
+        <img src="photos/warning.svg" alt="Warning">
+        <h2>⚠️ SECURITY WARNING</h2>
+        <p>Ye portfolio <b>authorized security testing</b><br>ke liye hai.</p>
+        <p class="dim-text">Isse aage badhne ka matlab hai ki aap<br>ethical hacking se familiar hain.</p>
+        <button id="warn-enter">▶ I UNDERSTAND — ENTER</button>
+    </div>
+</div>
+
+<div id="mobile-gate">
+    <div class="gate-box">
+        <span class="gate-icon">🖥️</span>
+        <h2>DESKTOP ONLY</h2>
+        <p>Ye portfolio sirf <b>Desktop / Laptop</b> par<br>khola ja sakta hai.</p>
+        <p class="dim-text">(Mobile / Tablet support nahi hai)</p>
+        <button id="gate-force">Phir bhi kholo 👀</button>
+    </div>
+</div>
+
+<div id="desktop">
+    <div id="icons">
+        <div class="icon" data-app="terminal"><span class="ico">🖥️</span><span class="lbl">Terminal</span></div>
+        <div class="icon" data-app="about"><span class="ico">👤</span><span class="lbl">About Me</span></div>
+        <div class="icon" data-app="skills"><span class="ico">⚡</span><span class="lbl">Skills</span></div>
+        <div class="icon" data-app="projects"><span class="ico">🛠️</span><span class="lbl">Projects</span></div>
+        <div class="icon" data-app="contact"><span class="ico">✉️</span><span class="lbl">Contact</span></div>
+        <div class="icon" data-app="photos"><span class="ico">🖼️</span><span class="lbl">Photos</span></div>
+        <div class="icon" data-app="firebox"><span class="ico">🦊</span><span class="lbl">Firebox</span></div>
+        <div class="icon" data-app="files"><span class="ico">📁</span><span class="lbl">Files</span></div>
+        <div class="icon" data-app="hackertyper"><span class="ico">⌨️</span><span class="lbl">Hacker Typer</span></div>
+        <div class="icon" data-app="sudo"><span class="ico">☠️</span><span class="lbl">sudo rm -rf /</span></div>
+    </div>
+    <div id="windows"></div>
+    <div id="startmenu">
+        <button data-app="terminal">🖥️ Terminal</button>
+        <button data-app="about">👤 About Me</button>
+        <button data-app="skills">⚡ Skills</button>
+        <button data-app="projects">🛠️ Projects</button>
+        <button data-app="contact">✉️ Contact</button>
+        <button data-app="photos">🖼️ Photos</button>
+        <button data-app="firebox">🦊 Firebox</button>
+        <button data-app="hackertyper">⌨️ Hacker Typer</button>
+    </div>
+    <div id="taskbar">
+        <button id="start">🐉 Kali</button>
+        <div id="tasks"></div>
+        <div id="clock"></div>
+    </div>
+</div>
+
+<script>
+// ==================== WARNING SCREEN ====================
+document.getElementById('warn-enter').addEventListener('click', () => {
+    document.getElementById('warning-screen').classList.add('hidden');
+});
+document.getElementById('warning-screen').addEventListener('click', (e) => {
+    if(e.target.id === 'warning-screen') {
+        document.getElementById('warning-screen').classList.add('hidden');
+    }
+});
+
+// ==================== DESKTOP-ONLY CHECK ====================
+const isMobile = window.innerWidth < 800 || (navigator.maxTouchPoints > 0 && matchMedia('(pointer: coarse)').matches);
+if (isMobile) {
+    document.getElementById('mobile-gate').classList.add('show');
+    document.getElementById('gate-force').addEventListener('click', () => {
+        document.getElementById('mobile-gate').classList.remove('show');
+    });
+}
+
+// ==================== APNI INFO ====================
+const MY_NAME = "Aapka Naam";
+const MY_ROLE = "Cybersecurity Enthusiast / Pentester";
+const MY_EMAIL = "aapka@email.com";
+const MY_GITHUB = "github.com/aapka-username";
+const MY_LINKEDIN = "linkedin.com/in/aapka-username";
+const MY_LOCATION = "India";
+
+const MY_SKILLS = [
+    "Penetration Testing (Web, Network, Wireless)",
+    "Kali Linux / Linux System Administration",
+    "Python & Bash Scripting",
+    "Network Security & Wireshark Analysis",
+    "Web App Security (OWASP Top 10)",
+    "OSINT & Reconnaissance",
+    "Burp Suite, Nmap, Metasploit, Hydra",
+    "CTF Player (TryHackMe / HackTheBox)"
+];
+const MY_PROJECTS = [
+    "Network Scanner Tool - Python port & service scanner",
+    "Phishing Awareness Lab - Email header analysis toolkit",
+    "Vulnerability Scanner - Auto-recon script for web apps",
+    "CTF Writeups - Documented solutions on GitHub"
+];
+const MY_CERTS = [
+    "eJPT (Junior Penetration Tester) - In Progress",
+    "CompTIA Security+ - In Progress",
+    "TryHackMe - Multiple paths completed"
+];
+// ====================================================================
+
+const BANNER = [
+"  ____    ____  ______     __  __     ______     ______   ______     ______",
+" /\\  _`\\ /\\  _`\\/\\__  _\\   /\\ \\/\\ \\   /\\  ___\\   /\\__  _\\ /\\  _  \\   /\\  ___\\",
+" \\ \\,\\L\\_\\ \\ \\L\\ \\/_/\\ \\/   \\ \\ \\_\\ \\  \\ \\  __\\   \\/_/\\ \\/ \\ \\ \\L\\ \\  \\ \\  __\\",
+"  \\/_\\__ \\\\ \\  _ <\\ \\ \\ \\    \\ \\_____\\  \\ \\_____\\    \\ \\_\\  \\ \\____ \\  \\ \\_____\\",
+"    /\\ \\L\\ \\ \\ \\L\\ \\ \\_\\ \\__  \\/____/    \\/_____/     \\/_/   \\/___\\ \\ \\  \\/_____/",
+"    \\ \\____\\ \\____\\/_____/   ____  __  __  _  _  ____  ____  ____",
+"     \\/_____/\\/___/          / ___)(  \\/  )( \\/ )(  _ \\(_  _)(  _ \\",
+"                             \\___ \\ )    (  )  (  )___/ _)(_  )   /",
+"                             (____/(_/\\/\\_)(_/\\\\)(__)  (____)(_\\_)",
+""
+].join("\n");
+
+// ==================== APP CONTENT ====================
+const aboutContent = () => `
+<h3>=== ABOUT ME ===</h3>
+<p>Hi! Main <span class="pink-text">${MY_NAME}</span> hoon, ek passionate security researcher.</p>
+<p>Penetration testing, network security aur ethical hacking me</p>
+<p>apni skills continuously improve kar raha hoon.</p>
+<br>
+<p><span class="k">Role:</span> <span class="v">${MY_ROLE}</span></p>
+<p><span class="k">Location:</span> <span class="v">${MY_LOCATION}</span></p>
+<p><span class="k">Interests:</span> <span class="v">Hacking, CTF, Bug Bounty, Open Source</span>`;
+
+const skillsContent = () => `
+<h3>=== SKILLS ===</h3>
+${MY_SKILLS.map(s => `<p><span class="blue-text">[+]</span> ${s}</p>`).join("")}`;
+
+const projectsContent = () => `
+<h3>=== PROJECTS ===</h3>
+${MY_PROJECTS.map((p,i) => `<p><span class="green-text">[${i+1}]</span> ${p}</p>`).join("")}`;
+
+const contactContent = () => `
+<h3>=== CONTACT ===</h3>
+<p><span class="k">Email:</span>    <span class="blue-text">${MY_EMAIL}</span></p>
+<p><span class="k">GitHub:</span>   <span class="blue-text">${MY_GITHUB}</span></p>
+<p><span class="k">LinkedIn:</span> <span class="blue-text">${MY_LINKEDIN}</span></p>
+<p><span class="k">Location:</span> <span class="v">${MY_LOCATION}</span>`;
+
+const filesContent = () => `
+<h3>=== HOME / root ===</h3>
+<div class="f-item" data-f="secret_notes.txt">📄 secret_notes.txt</div>
+<div class="f-item" data-f="todo.txt">📄 todo.txt</div>
+<div class="f-item" data-f="wallpaper.jpg">🖼️ wallpaper.jpg</div>
+<div class="f-item" data-f="flag.txt">🚩 flag.txt</div>
+<div class="f-item" data-f="readme.md">📄 readme.md</div>
+<div id="files-msg" class="dim-text" style="margin-top:12px"></div>`;
+
+const sudoContent = () => `
+<h3>⚠️ SYSTEM CHECK</h3>
+<p>Running: <span class="blue-text">sudo rm -rf /</span></p>
+<p>Result: <span class="green-text">100% - Nothing happened. Nice try! 😉</span></p>
+<p class="dim-text">(Is portfolio me aapka data safe hai)</p>`;
+
+const hackerContent = () => `<div class="hack-out" id="hack-out"></div><div class="term-in"><span class="prompt">anonymous@darknet:~$</span><span class="dim-text">(koi bhi key dabao...)</span></div>`;
+
+const terminalContent = () => `
+<div class="term">
+    <div class="term-out"></div>
+    <div class="term-in">
+        <span class="prompt">root@kali:~#</span>
+        <input class="term-cmd" autocomplete="off" spellcheck="false">
+    </div>
+</div>`;
+
+const photosContent = () => `
+<h3>📷 PHOTOS</h3>
+<p class="dim-text">(Apni .jpg .png photos "photos/" folder me daalein)</p>
+<div class="photo-grid" id="photo-grid"></div>
+<div class="photo-preview hidden" id="photo-preview">
+    <div style="text-align:center">
+        <div id="preview-image" style="font-size:80px;color:#00ff41;">🖼️</div>
+        <p id="preview-name" class="dim-text" style="margin-top:8px;"></p>
+        <p class="dim-text" style="margin-top:18px;font-size:11px;">(Click anywhere to close)</p>
+    </div>
+</div>`;
+
+const fireboxContent = () => `
+<div class="browser-bar">
+    <span class="browser-nav">◀</span>
+    <span class="browser-nav">▶</span>
+    <span class="browser-nav">↻</span>
+    <input class="browser-url" value="https://www.google.com" readonly>
+</div>
+<div class="browser-content" id="browser-content">
+    <h3>🦊 Firebox Browser</h3>
+    <p>Neeche diye gaye links me se koi bhi click karein:</p>
+    <br>
+    <div class="f-item" data-url="https://www.google.com">🔍 Google</div>
+    <div class="f-item" data-url="https://www.github.com">🐙 GitHub</div>
+    <div class="f-item" data-url="https://www.hackerone.com">☠️ HackerOne</div>
+    <div class="f-item" data-url="https://tryhackme.com">🎯 TryHackMe</div>
+    <div class="f-item" data-url="https://app.hackthebox.com">🏴 HackTheBox</div>
+    <div class="f-item" data-url="https://www.exploit-db.com">💾 Exploit-DB</div>
+    <div class="f-item" data-url="https://www.kali.org">🐉 Kali Linux</div>
+    <br>
+    <p class="dim-text">(Ya URL bar me kuch bhi type karein)</p>
+    <div style="margin-top:10px;display:flex;gap:6px;">
+        <input id="browser-input" class="term-cmd" style="flex:1;background:#111;border:1px solid #333;padding:8px;border-radius:4px;" placeholder="URL type karein...">
+        <button id="browser-go" style="background:#00ff41;color:#000;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-weight:bold;">GO</button>
+    </div>
+    <div id="browser-iframe-wrap" style="margin-top:12px;display:none;">
+        <iframe id="browser-iframe" style="width:100%;height:300px;border:1px solid #333;border-radius:6px;background:#fff;"></iframe>
+        <p class="dim-text" style="margin-top:5px;">🔒 Isolated — portfolio ka part hai</p>
+    </div>
+</div>`;
+
+const APPS = {
+    terminal:    { name:"Terminal",     icon:"🖥️", w:680, h:460, content:terminalContent, onOpen:startTerminal, term:true },
+    about:       { name:"About Me",     icon:"👤", w:420, h:300, content:aboutContent },
+    skills:      { name:"Skills",       icon:"⚡", w:440, h:360, content:skillsContent },
+    projects:    { name:"Projects",     icon:"🛠️", w:460, h:340, content:projectsContent },
+    contact:     { name:"Contact",      icon:"✉️", w:420, h:280, content:contactContent },
+    photos:      { name:"Photos",       icon:"🖼️", w:500, h:400, content:photosContent, onOpen:startPhotos },
+    firebox:     { name:"Firebox",      icon:"🦊", w:720, h:500, content:fireboxContent, onOpen:startFirebox },
+    files:       { name:"Files",        icon:"📁", w:400, h:320, content:filesContent, onOpen:startFiles },
+    hackertyper: { name:"Hacker Typer", icon:"⌨️", w:540, h:320, content:hackerContent, onOpen:startHacker },
+    sudo:        { name:"sudo rm -rf /",icon:"☠️", w:400, h:240, content:sudoContent }
+};
+
+// ==================== WINDOW MANAGER ====================
+let zTop = 10;
+const openWins = {};
+
+function focusWin(win){
+    zTop++; win.style.zIndex = zTop;
+    document.querySelectorAll('#tasks button').forEach(b => b.classList.remove('active'));
+    const tb = document.querySelector(`#tasks button[data-app="${win.dataset.app}"]`);
+    if(tb) tb.classList.add('active');
+}
+function openApp(id){
+    const cfg = APPS[id];
+    if(!cfg) return;
+    if(openWins[id]){
+        const w = openWins[id];
+        w.style.display = 'flex';
+        focusWin(w);
+        return;
+    }
+    const win = document.createElement('div');
+    win.className = 'window'; win.dataset.app = id; win.tabIndex = 0;
+    win.style.width = cfg.w+'px'; win.style.height = cfg.h+'px';
+    const n = Object.keys(openWins).length;
+    win.style.left = (70 + (n%6)*45) + 'px';
+    win.style.top  = (50 + (n%6)*35) + 'px';
+    win.innerHTML = `
+        <div class="titlebar">
+            <span class="title">${cfg.icon} ${cfg.name}</span>
+            <div class="btn-wrap">
+                <button class="btn min" title="Minimize">–</button>
+                <button class="btn close" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="content${cfg.term ? ' term-content' : ''}">${cfg.content()}</div>`;
+    document.getElementById('windows').appendChild(win);
+    openWins[id] = win;
+
+    const tb = document.createElement('button');
+    tb.textContent = cfg.name; tb.dataset.app = id;
+    tb.addEventListener('click', () => toggleWin(id));
+    document.getElementById('tasks').appendChild(tb);
+
+    win.querySelector('.close').addEventListener('click', e => { e.stopPropagation(); closeApp(id); });
+    win.querySelector('.min').addEventListener('click', e => { e.stopPropagation(); win.style.display='none'; tb.classList.remove('active'); });
+    makeDraggable(win, win.querySelector('.titlebar'));
+    win.addEventListener('mousedown', () => focusWin(win));
+    tb.classList.add('active');
+    focusWin(win);
+    if(cfg.onOpen) cfg.onOpen(win);
+}
+function closeApp(id){
+    const win = openWins[id];
+    if(win) win.remove();
+    delete openWins[id];
+    const tb = document.querySelector(`#tasks button[data-app="${id}"]`);
+    if(tb) tb.remove();
+}
+function toggleWin(id){
+    const win = openWins[id];
+    if(!win) return;
+    if(win.style.display === 'none'){ win.style.display='flex'; focusWin(win); }
+    else { win.style.display='none'; }
+}
+function makeDraggable(win, bar){
+    let sx, sy, ox, oy, drag = false;
+    bar.addEventListener('pointerdown', e => {
+        if (e.target.closest('button')) return;
+        drag = true; sx = e.clientX; sy = e.clientY;
+        const r = win.getBoundingClientRect(); ox = r.left; oy = r.top;
+        bar.setPointerCapture(e.pointerId);
+        e.preventDefault();
+    });
+    bar.addEventListener('pointermove', e => {
+        if(!drag) return;
+        win.style.left = (ox + e.clientX - sx) + 'px';
+        win.style.top  = (oy + e.clientY - sy) + 'px';
+    });
+    bar.addEventListener('pointerup', () => { drag = false; });
+}
+
+document.querySelectorAll('.icon').forEach(ic => {
+    ic.addEventListener('click', () => openApp(ic.dataset.app));
+});
+
+const sm = document.getElementById('startmenu');
+document.getElementById('start').addEventListener('click', e => {
+    e.stopPropagation();
+    sm.style.display = sm.style.display === 'block' ? 'none' : 'block';
+});
+sm.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    openApp(b.dataset.app); sm.style.display = 'none';
+}));
+document.addEventListener('click', () => sm.style.display = 'none');
+
+function tick(){
+    const d = new Date();
+    document.getElementById('clock').textContent =
+        d.toLocaleDateString('hi-IN') + ' ' + d.toLocaleTimeString('hi-IN');
+}
+setInterval(tick, 1000); tick();
+
+// ==================== FILES APP ====================
+function startFiles(win){
+    win.querySelectorAll('.f-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const msg = win.querySelector('#files-msg');
+            const f = item.dataset.f;
+            if(f === 'flag.txt') msg.innerHTML = '<span class="green-text">🏁 flag{you_found_me}</span>';
+            else if(f === 'readme.md') msg.innerHTML = '<span class="blue-text"># Portfolio<br>Type "help" in Terminal 😎</span>';
+            else msg.innerHTML = '<span class="red-text">Permission denied (EACCES) - root bhi ro sakta hai 🤷</span>';
+        });
+    });
+}
+
+// ==================== PHOTOS APP ====================
+function startPhotos(win){
+    const grid = win.querySelector('#photo-grid');
+    const preview = win.querySelector('#photo-preview');
+    const pimg = win.querySelector('#preview-image');
+    const pname = win.querySelector('#preview-name');
+
+    // Fetch photos list
+    fetch('photos/')
+        .then(r => r.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const links = doc.querySelectorAll('a');
+            const imageExts = ['.jpg','.jpeg','.png','.gif','.svg','.webp','.bmp'];
+            let found = false;
+            links.forEach(a => {
+                const href = a.getAttribute('href');
+                if(!href || href === '../' || href === './') return;
+                const ext = href.substring(href.lastIndexOf('.')).toLowerCase();
+                const isImg = imageExts.includes(ext);
+                if(isImg || ext === '.txt') {
+                    found = true;
+                    const div = document.createElement('div');
+                    div.className = 'photo-item';
+                    div.innerHTML = `<span class="photo-icon">${isImg ? '🖼️' : '📄'}</span><span class="photo-name">${href}</span>`;
+                    div.addEventListener('click', () => {
+                        pimg.innerHTML = isImg ? `<img src="photos/${href}" style="max-width:400px;max-height:300px;border-radius:8px;border:1px solid #00ff41;">` : `<span style="font-size:60px;">📄</span>`;
+                        pname.textContent = href;
+                        preview.classList.remove('hidden');
+                    });
+                    grid.appendChild(div);
+                }
+            });
+            if(!found) {
+                grid.innerHTML = '<p class="dim-text">Koi photos nahi mili. "photos/" folder me .jpg ya .png daalein.</p>';
+            }
+        })
+        .catch(() => {
+            grid.innerHTML = '<p class="dim-text">Photos folder available nahi hai. "photos/" folder banayein.</p>';
+        });
+
+    preview.addEventListener('click', () => preview.classList.add('hidden'));
+}
+
+// ==================== FIREBOX (BROWSER) APP ====================
+function startFirebox(win){
+    const content = win.querySelector('#browser-content');
+    const urlInput = content.querySelector('#browser-input');
+    const goBtn = content.querySelector('#browser-go');
+    const iframeWrap = content.querySelector('#browser-iframe-wrap');
+    const iframe = content.querySelector('#browser-iframe');
+    const urlBar = content.querySelector('.browser-url');
+
+    function navigate(url) {
+        if(!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+        }
+        urlBar.value = url;
+        iframe.src = url;
+        iframeWrap.style.display = 'block';
+    }
+
+    goBtn.addEventListener('click', () => navigate(urlInput.value));
+    urlInput.addEventListener('keydown', e => {
+        if(e.key === 'Enter') navigate(urlInput.value);
+    });
+
+    // Click on bookmarks
+    content.querySelectorAll('.f-item[data-url]').forEach(item => {
+        item.addEventListener('click', () => {
+            const url = item.dataset.url;
+            urlInput.value = url;
+            navigate(url);
+        });
+    });
+}
+
+// ==================== HACKER TYPER ====================
+function startHacker(win){
+    const out = win.querySelector('#hack-out');
+    const words = ["root@kali","exploit","payload","0x00","0xFF","sudo","nmap","hydra","metasploit","buffer_overflow","reverse_shell","wireshark","crack","bypass","inject","$HOME","/dev/null","nc -lvp 4444","GET /admin","401","200 OK","ACCESS_DENIED","brute_force","kerberoast","lateral_movement","privesc","rooted!"];
+    win.addEventListener('keydown', function hk(e){
+        if(win.style.display === 'none') return;
+        const chunk = Array.from({length: 3 + Math.floor(Math.random()*8)},
+            () => words[Math.floor(Math.random()*words.length)]).join(' ');
+        out.textContent += ' ' + chunk;
+        out.scrollTop = out.scrollHeight;
+    });
+}
+
+// ==================== TERMINAL ====================
+const COMMANDS = {
+    "help": { desc:"Available commands dikhata hai", run(t){
+        t.print("<span class='highlight'>Available Commands:</span><br>");
+        for(const [c,i] of Object.entries(COMMANDS))
+            t.print(`  <span class='blue-text'>${c.padEnd(14)}</span> ${i.desc}`);
+        t.print("<br><span class='dim-text'>Tip: Tab = autocomplete, Up/Down = history</span>");
+    }},
+    "whoami": { desc:"Naam aur role dikhata hai", run(t){ t.print(`${MY_NAME} - ${MY_ROLE}`); }},
+    "about": { desc:"Mere baare mein", run(t){
+        t.print("<span class='highlight'>=== ABOUT ME ===</span><br>");
+        t.print(`Hi! Main <span class='pink-text'>${MY_NAME}</span> hoon, ek passionate security researcher.`);
+        t.print("Penetration testing, network security aur ethical hacking me");
+        t.print("apni skills continuously improve kar raha hoon.<br>");
+        t.print(`Location: ${MY_LOCATION}`);
+        t.print("Interests: Hacking, CTF, Bug Bounty, Open Source");
+    }},
+    "skills": { desc:"Skills list karta hai", run(t){
+        t.print("<span class='highlight'>=== SKILLS ===</span><br>");
+        MY_SKILLS.forEach(s => t.print(`  <span class='blue-text'>[+]</span> ${s}`));
+    }},
+    "projects": { desc:"Projects dikhata hai", run(t){
+        t.print("<span class='highlight'>=== PROJECTS ===</span><br>");
+        MY_PROJECTS.forEach((p,i) => t.print(`  <span class='green-text'>[${i+1}]</span> ${p}`));
+    }},
+    "certs": { desc:"Certifications dikhata hai", run(t){
+        t.print("<span class='highlight'>=== CERTIFICATIONS ===</span><br>");
+        MY_CERTS.forEach(c => t.print(`  <span class='green-text'>[*]</span> ${c}`));
+    }},
+    "contact": { desc:"Contact details", run(t){
+        t.print("<span class='highlight'>=== CONTACT ===</span><br>");
+        t.print(`  Email:    <span class='blue-text'>${MY_EMAIL}</span>`);
+        t.print(`  GitHub:   <span class='blue-text'>${MY_GITHUB}</span>`);
+        t.print(`  LinkedIn: <span class='blue-text'>${MY_LINKEDIN}</span>`);
+    }},
+    "neofetch": { desc:"System info (ASCII art)", run(t){
+        const nf = [
+"        ▄▄▄▄▄▄▄▄▄▄▄        <span class='pink-text'>root@kali</span>",
+"      ▄█████████████▄      <span class='dim-text'>-------------</span>",
+"    ▄███▓▓▓▓▓▓▓▓▓███▄     <span class='blue-text'>OS:</span>       Kali Portfolio 2026.1",
+"  ▄███▓▓▓▓▓▓▓▓▓▓▓▓███▄   <span class='blue-text'>Host:</span>     My Portfolio Machine",
+"▄███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███▄  <span class='blue-text'>Kernel:</span>   6.6.0-kali1-amd64",
+"███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███  <span class='blue-text'>Uptime:</span>   Always On",
+"███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███  <span class='blue-text'>Shell:</span>    bash 5.2.15",
+"███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███  <span class='blue-text'>DE:</span>       Portfolio Desktop",
+"▀███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███▀  <span class='blue-text'>WM:</span>       HackerWM",
+"  ▀███▓▓▓▓▓▓▓▓▓▓▓▓███▀   <span class='blue-text'>CPU:</span>      Your Brain (∞ cores)",
+"    ▀███▓▓▓▓▓▓▓▓▓███▀    <span class='blue-text'>Memory:</span>   Unlimited",
+"      ▀█████████████▀     <span class='blue-text'>Name:</span>     ${MY_NAME}",
+"        ▀▀▀▀▀▀▀▀▀▀▀"
+        ].join("\n");
+        t.print(`<span class='ascii'>${nf}</span>`);
+    }},
+    "ls": { desc:"Files dikhata hai", run(t){
+        t.print("<span class='dim-text'>total 24</span>");
+        t.print("<span class='blue-text'>drwxr-xr-x</span> root root  4096 Jul 21 10:00 <span class='blue-text'>photos/</span>");
+        t.print("<span class='blue-text'>-rw-r--r--</span> root root   512 Jul 21 10:00 skills.txt");
+        t.print("<span class='blue-text'>-rw-r--r--</span> root root   256 Jul 21 10:00 contact.md");
+        t.print("<span class='blue-text'>-rwxr-xr-x</span> root root  1024 Jul 21 10:00 about.sh");
+        t.print("<span class='blue-text'>-rw-r--r--</span> root root    13 Jul 21 10:00 flag.txt");
+        t.print("<br><span class='dim-text'>Try: cat flag.txt</span>");
+    }},
+    "cat": { desc:"File content (cat flag.txt)", run(t, arg){
+        if(arg === 'flag.txt') t.print("<span class='green-text'>🏁 flag{portfolio_complete}</span>");
+        else if(arg === 'skills.txt') MY_SKILLS.forEach(s => t.print(`  <span class='blue-text'>[+]</span> ${s}`));
+        else if(arg === 'about.sh') t.print("<span class='dim-text'>#!/bin/bash<br>echo 'Main ek security researcher hoon!'</span>");
+        else if(arg === 'contact.md') t.print(`# Contact\n${MY_EMAIL}\n${MY_GITHUB}`);
+        else t.print(`<span class='red-text'>cat: ${arg || '??? '}: No such file or directory</span>`);
+    }},
+    "hack": { desc:"Hacking simulation", run(t){
+        const steps = ["Initializing exploit...","Bypassing firewall...","Injecting payload...","Brute forcing password...","Accessing root shell..."];
+        steps.forEach((s,i) => setTimeout(() => {
+            t.print(`<span class='dim-text'>[${'■'.repeat(i+1)}${'□'.repeat(4-i)}]</span> ${s}`);
+        }, i*500));
+        setTimeout(() => t.print("<span class='green-text'>ACCESS GRANTED - Welcome to the matrix, root. 😎</span>"), steps.length*500+300);
+    }},
+    "banner": { desc:"ASCII banner dobara", run(t){ t.print(`<span class='ascii'>${BANNER}</span>`); }},
+    "date": { desc:"Aaj ki date/time", run(t){ t.print(new Date().toString()); }},
+    "clear": { desc:"Terminal clear karta hai", run(t){ t.clear(); }},
+    "exit": { desc:"Terminal band karta hai", run(t){
+        t.print("<span class='dim-text'>logout</span>");
+        setTimeout(() => closeApp('terminal'), 400);
+    }},
+    "sudo": { desc:"Joke 😄", run(t){
+        t.print("<span class='red-text'>Nice try! Is portfolio me sudo nahi chalta. 😄</span>");
+        t.print("<span class='dim-text'>(Aap already root ho!)</span>");
+    }}
+};
+
+function startTerminal(win){
+    const out = win.querySelector('.term-out');
+    const input = win.querySelector('.term-cmd');
+    const promptEl = win.querySelector('.prompt');
+    const t = {
+        print(text){ const d = document.createElement('div'); d.innerHTML = text; out.appendChild(d); out.scrollTop = out.scrollHeight; },
+        clear(){ out.innerHTML = ''; }
+    };
+    let hist = [], hi = -1;
+
+    t.print(`<span class='ascii'>${BANNER}</span>`);
+    t.print("<span class='highlight'>Welcome to my terminal portfolio!</span>");
+    t.print("Type <span class='blue-text'>help</span> ya <span class='blue-text'>neofetch</span> shuru karne ke liye.<br>");
+
+    input.addEventListener('keydown', e => {
+        if(e.key === 'Enter'){
+            const cmd = input.value.trim().toLowerCase();
+            t.print(`${promptEl.textContent} ${input.value}`);
+            input.value = '';
+            if(cmd){
+                hist.push(cmd); hi = hist.length;
+                const parts = cmd.split(/\s+/);
+                const base = parts[0], arg = parts.slice(1).join(' ');
+                if(COMMANDS[base]) COMMANDS[base].run(t, arg);
+                else t.print(`<span class='red-text'>bash: ${base}: command not found</span>`);
+            }
+            t.print('');
+        } else if(e.key === 'ArrowUp'){
+            e.preventDefault();
+            if(hi > 0){ hi--; input.value = hist[hi]; }
+        } else if(e.key === 'ArrowDown'){
+            e

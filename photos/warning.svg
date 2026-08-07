@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#1a1a1a" rx="20"/>
+  <polygon points="100,25 175,160 25,160" fill="none" stroke="#ff5555" stroke-width="4"/>
+  <text x="100" y="115" text-anchor="middle" font-size="60" font-weight="bold" fill="#ff5555">!</text>
+  <text x="100" y="148" text-anchor="middle" font-size="14" fill="#ff5555" font-family="monospace">WARNING</text>
+</svg>

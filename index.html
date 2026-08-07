@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rajesh Patra | Portfolio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- WARNING SCREEN -->
+<div id="warning-screen">
+    <div class="warning-box" onclick="event.stopPropagation()">
+        <img src="photos/warning.svg" alt="Warning">
+        <h2>⚠️ SECURITY WARNING</h2>
+        <p>Ye portfolio <b>authorized security testing</b><br>ke liye hai.</p>
+        <p class="dim-text">Isse aage badhne ka matlab hai ki aap<br>ethical hacking se familiar hain.</p>
+        <button id="warn-enter" onclick="document.getElementById('warning-screen').classList.add('hidden');document.getElementById('follow-gate').classList.remove('hidden');">▶ I UNDERSTAND — CONTINUE</button>
+    </div>
+</div>
+
+<!-- INSTAGRAM FOLLOW GATE (apps iske peeche HIDDEN hain, delete nahi) -->
+<div id="follow-gate">
+    <div class="follow-box">
+        <span class="fg-icon">📸</span>
+        <h2>PEHLE FOLLOW KARO! 🔥</h2>
+        <p>Portfolio andar jane se pehle<br><b>Instagram pe follow karna hoga</b> 👇</p>
+        <a class="fg-ig-btn" href="https://www.instagram.com/_itz_editz__07" target="_blank">📸 @_itz_editz__07 — FOLLOW KARO</a>
+        <p class="dim-text">(Instagram naye tab me khulega — follow karke wapas aana)</p>
+        <button id="fg-enter" onclick="document.getElementById('follow-gate').classList.add('hidden');document.body.classList.add('revealed');">✅ Maine Follow Kar Diya — Andar Jao</button>
+    </div>
+</div>
+
+<!-- MOBILE GATE -->
+<div id="mobile-gate">
+    <div class="gate-box">
+        <span class="gate-icon">🖥️</span>
+        <h2>DESKTOP ONLY</h2>
+        <p>Ye portfolio sirf <b>Desktop / Laptop</b> par<br>khola ja sakta hai.</p>
+        <button id="gate-force" onclick="document.getElementById('mobile-gate').style.display='none'">Phir bhi kholo 👀</button>
+    </div>
+</div>
+
+<!-- DESKTOP (apps yahan HIDDEN rehti hain follow gate ke peeche) -->
+<div id="desktop">
+    <div id="icons">
+        <div class="icon" data-app="terminal"><span class="ico"></span><span class="lbl">Terminal</span></div>
+        <div class="icon" data-app="about"><span class="ico"></span><span class="lbl">About Me</span></div>
+        <div class="icon" data-app="skills"><span class="ico"></span><span class="lbl">Skills</span></div>
+        <div class="icon" data-app="interests"><span class="ico"></span><span class="lbl">Interests</span></div>
+        <div class="icon" data-app="projects"><span class="ico"></span><span class="lbl">Projects</span></div>
+        <div class="icon" data-app="certs"><span class="ico"></span><span class="lbl">Certifications</span></div>
+        <div class="icon" data-app="contact"><span class="ico"></span><span class="lbl">Contact</span></div>
+        <div class="icon" data-app="photos"><span class="ico"></span><span class="lbl">Photos</span></div>
+        <div class="icon" data-app="firebox"><span class="ico"></span><span class="lbl">Firebox</span></div>
+        <div class="icon" data-app="files"><span class="ico"></span><span class="lbl">Files</span></div>
+        <div class="icon" data-app="hackertyper"><span class="ico"></span><span class="lbl">Hacker Typer</span></div>
+        <div class="icon" data-app="sudo"><span class="ico"></span><span class="lbl">sudo rm -rf /</span></div>
+    </div>
+    <div id="windows"></div>
+    <div id="startmenu">
+        <button data-app="terminal">🖥️ Terminal</button>
+        <button data-app="about">👤 About Me</button>
+        <button data-app="skills">⚡ Skills</button>
+        <button data-app="interests">🎯 Interests</button>
+        <button data-app="projects">🛠️ Projects</button>
+        <button data-app="certs">🏅 Certifications</button>
+        <button data-app="contact">✉️ Contact</button>
+        <button data-app="photos">🖼️ Photos</button>
+        <button data-app="firebox">🦊 Firebox</button>
+        <button data-app="hackertyper">⌨️ Hacker Typer</button>
+    </div>
+    <div id="taskbar">
+        <button id="start">🐉 Kali</button>
+        <div id="tasks"></div>
+        <div id="clock"></div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

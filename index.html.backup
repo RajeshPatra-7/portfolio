@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kali Portfolio Desktop</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Fira Code','Courier New',monospace; user-select:none; }
+html,body { height:100%; overflow:hidden; }
+
+/* ============ DESKTOP (yahan wallpaper hai) ============ */
+#desktop {
+    height:100vh; width:100vw;
+    background: url('wallpaper.jpg') center/cover no-repeat,
+                linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+    position:relative;
+}
+
+/* ============ APP ICONS ============ */
+#icons { position:absolute; top:0; left:0; bottom:40px; display:flex; flex-direction:column; flex-wrap:wrap; align-content:flex-start; padding:15px; gap:12px; }
+.icon { width:92px; text-align:center; cursor:pointer; padding:10px 4px; border-radius:8px; color:#fff; text-shadow:1px 1px 3px #000; }
+.icon:hover { background:rgba(255,255,255,.18); }
+.icon:active { background:rgba(0,255,65,.25); }
+.icon .ico { font-size:40px; display:block; margin-bottom:5px; filter:drop-shadow(2px 3px 4px rgba(0,0,0,.8)); }
+.icon .lbl { font-size:12px; font-weight:bold; }
+
+/* ============ WINDOWS ============ */
+.window { position:absolute; background:#0d0d0d; border:1px solid #00ff41; border-radius:10px; box-shadow:0 12px 35px rgba(0,0,0,.7); display:flex; flex-direction:column; overflow:hidden; }
+.window .titlebar { background:#161616; color:#00ff41; padding:8px 10px; display:flex; align-items:center; cursor:move; border-bottom:1px solid #00ff41; font-size:13px; }
+.window .title { flex:1; font-weight:bold; }
+.window .btn { width:20px; height:20px; border-radius:50%; border:none; margin-left:6px; cursor:pointer; font-size:11px; line-height:20px; text-align:center; color:#000; font-weight:bold; }
+.btn.close { background:#ff5555; }
+.btn.min { background:#ffbd2e; }
+.window .content { flex:1; overflow:auto; padding:14px; color:#00ff00; font-size:13px; line-height:1.6; }
+.content.term-content { padding:0; display:flex; }
+.content h3 { color:#ffcc00; margin-bottom:8px; }
+.content .k { color:#569cd6; }
+.content .v { color:#00ff00; }
+.f-item { cursor:pointer; padding:3px 6px; border-radius:4px; }
+.f-item:hover { background:#1a1a1a; color:#ffcc00; }
+
+/* ============ TERMINAL ============ */
+.term { flex:1; display:flex; flex-direction:column; min-height:0; }
+.term-out { flex:1; overflow-y:auto; padding:10px; font-size:13px; line-height:1.5; }
+.term-in { display:flex; align-items:center; padding:8px 10px; background:#0a0a0a; border-top:1px solid #00ff41; }
+.term-in .prompt { color:#00ff41; font-weight:bold; margin-right:8px; white-space:nowrap; }
+.term-cmd { flex:1; background:transparent; border:none; outline:none; color:#00ff41; font-size:13px; caret-color:#00ff41; }
+.highlight { color:#ffcc00; font-weight:bold; }
+.red-text { color:#ff5555; }
+.blue-text { color:#569cd6; }
+.pink-text { color:#ff79c6; }
+.dim-text { color:#888; }
+.green-text { color:#00ff41; }
+.ascii { color:#ff5555; white-space:pre; line-height:1.2; font-size:11px; }
+.hack-out { flex:1; overflow:auto; padding:10px; color:#00ff41; font-size:13px; white-space:pre-wrap; word-break:break-all; }
+
+/* ============ TASKBAR ============ */
+#taskbar { position:fixed; bottom:0; left:0; right:0; height:40px; background:rgba(18,18,18,.93); border-top:1px solid #333; display:flex; align-items:center; padding:0 10px; z-index:9999; }
+#start { background:#00ff41; color:#000; font-weight:bold; border:none; padding:6px 14px; border-radius:5px; cursor:pointer; font-size:13px; }
+#tasks { flex:1; display:flex; gap:6px; margin-left:10px; overflow-x:auto; }
+#tasks button { background:#222; color:#aaa; border:1px solid #444; border-radius:5px; padding:4px 12px; cursor:pointer; font-size:12px; white-space:nowrap; }
+#tasks button.active { background:#00ff41; color:#000; border-color:#00ff41; }
+#clock { color:#aaa; font-size:12px; margin-left:10px; white-space:nowrap; }
+
+#startmenu { position:fixed; bottom:46px; left:10px; background:#161616; border:1px solid #00ff41; border-radius:8px; padding:8px; z-index:10000; display:none; min-width:160px; }
+#startmenu button { display:block; width:100%; background:none; border:none; color:#00ff41; text-align:left; padding:8px 10px; cursor:pointer; font-size:13px; border-radius:5px; }
+#startmenu button:hover { background:#00ff41; color:#000; }
+
+::-webkit-scrollbar { width:8px; }
+::-webkit-scrollbar-track { background:#111; }
+::-webkit-scrollbar-thumb { background:#00ff41; border-radius:4px; }
+</style>
+</head>
+<body>
+<div id="desktop">
+    <div id="icons">
+        <div class="icon" data-app="terminal"><span class="ico">🖥️</span><span class="lbl">Terminal</span></div>
+        <div class="icon" data-app="about"><span class="ico">👤</span><span class="lbl">About Me</span></div>
+        <div class="icon" data-app="skills"><span class="ico">⚡</span><span class="lbl">Skills</span></div>
+        <div class="icon" data-app="projects"><span class="ico">🛠️</span><span class="lbl">Projects</span></div>
+        <div class="icon" data-app="contact"><span class="ico">✉️</span><span class="lbl">Contact</span></div>
+        <div class="icon" data-app="files"><span class="ico">📁</span><span class="lbl">Files</span></div>
+        <div class="icon" data-app="hackertyper"><span class="ico">⌨️</span><span class="lbl">Hacker Typer</span></div>
+        <div class="icon" data-app="sudo"><span class="ico">☠️</span><span class="lbl">sudo rm -rf /</span></div>
+    </div>
+    <div id="windows"></div>
+    <div id="startmenu">
+        <button data-app="terminal">🖥️ Terminal</button>
+        <button data-app="about">👤 About Me</button>
+        <button data-app="skills">⚡ Skills</button>
+        <button data-app="projects">🛠️ Projects</button>
+        <button data-app="contact">✉️ Contact</button>
+        <button data-app="hackertyper">⌨️ Hacker Typer</button>
+    </div>
+    <div id="taskbar">
+        <button id="start">🐉 Kali</button>
+        <div id="tasks"></div>
+        <div id="clock"></div>
+    </div>
+</div>
+
+<script>
+// ==================== APNI INFO YAHAN EDIT KAREIN ====================
+const MY_NAME = "Aapka Naam";
+const MY_ROLE = "Cybersecurity Enthusiast / Pentester";
+const MY_EMAIL = "aapka@email.com";
+const MY_GITHUB = "github.com/aapka-username";
+const MY_LINKEDIN = "linkedin.com/in/aapka-username";
+const MY_LOCATION = "India";
+
+const MY_SKILLS = [
+    "Penetration Testing (Web, Network, Wireless)",
+    "Kali Linux / Linux System Administration",
+    "Python & Bash Scripting",
+    "Network Security & Wireshark Analysis",
+    "Web App Security (OWASP Top 10)",
+    "OSINT & Reconnaissance",
+    "Burp Suite, Nmap, Metasploit, Hydra",
+    "CTF Player (TryHackMe / HackTheBox)"
+];
+const MY_PROJECTS = [
+    "Network Scanner Tool - Python port & service scanner",
+    "Phishing Awareness Lab - Email header analysis toolkit",
+    "Vulnerability Scanner - Auto-recon script for web apps",
+    "CTF Writeups - Documented solutions on GitHub"
+];
+const MY_CERTS = [
+    "eJPT (Junior Penetration Tester) - In Progress",
+    "CompTIA Security+ - In Progress",
+    "TryHackMe - Multiple paths completed"
+];
+// ====================================================================
+
+const BANNER = [
+"  ____    ____  ______     __  __     ______     ______   ______     ______",
+" /\\  _`\\ /\\  _`\\/\\__  _\\   /\\ \\/\\ \\   /\\  ___\\   /\\__  _\\ /\\  _  \\   /\\  ___\\",
+" \\ \\,\\L\\_\\ \\ \\L\\ \\/_/\\ \\/   \\ \\ \\_\\ \\  \\ \\  __\\   \\/_/\\ \\/ \\ \\ \\L\\ \\  \\ \\  __\\",
+"  \\/_\\__ \\\\ \\  _ <\\ \\ \\ \\    \\ \\_____\\  \\ \\_____\\    \\ \\_\\  \\ \\____ \\  \\ \\_____\\",
+"    /\\ \\L\\ \\ \\ \\L\\ \\ \\_\\ \\__  \\/____/    \\/_____/     \\/_/   \\/___\\ \\ \\  \\/_____/",
+"    \\ \\____\\ \\____\\/_____/   ____  __  __  _  _  ____  ____  ____",
+"     \\/_____/\\/___/          / ___)(  \\/  )( \\/ )(  _ \\(_  _)(  _ \\",
+"                             \\___ \\ )    (  )  (  )___/ _)(_  )   /",
+"                             (____/(_/\\/\\_)(_/\\\\)(__)  (____)(_\\_)",
+""
+].join("\n");
+
+// ==================== APP CONTENT ====================
+const aboutContent = () => `
+<h3>=== ABOUT ME ===</h3>
+<p>Hi! Main <span class="pink-text">${MY_NAME}</span> hoon, ek passionate security researcher.</p>
+<p>Penetration testing, network security aur ethical hacking me</p>
+<p>apni skills continuously improve kar raha hoon.</p>
+<br>
+<p><span class="k">Role:</span> <span class="v">${MY_ROLE}</span></p>
+<p><span class="k">Location:</span> <span class="v">${MY_LOCATION}</span></p>
+<p><span class="k">Interests:</span> <span class="v">Hacking, CTF, Bug Bounty, Open Source</span></p>`;
+
+const skillsContent = () => `
+<h3>=== SKILLS ===</h3>
+${MY_SKILLS.map(s => `<p><span class="blue-text">[+]</span> ${s}</p>`).join("")}`;
+
+const projectsContent = () => `
+<h3>=== PROJECTS ===</h3>
+${MY_PROJECTS.map((p,i) => `<p><span class="green-text">[${i+1}]</span> ${p}</p>`).join("")}`;
+
+const contactContent = () => `
+<h3>=== CONTACT ===</h3>
+<p><span class="k">Email:</span>    <span class="blue-text">${MY_EMAIL}</span></p>
+<p><span class="k">GitHub:</span>   <span class="blue-text">${MY_GITHUB}</span></p>
+<p><span class="k">LinkedIn:</span> <span class="blue-text">${MY_LINKEDIN}</span></p>
+<p><span class="k">Location:</span> <span class="v">${MY_LOCATION}</span></p>`;
+
+const filesContent = () => `
+<h3>=== HOME / root ===</h3>
+<div class="f-item" data-f="secret_notes.txt">📄 secret_notes.txt</div>
+<div class="f-item" data-f="todo.txt">📄 todo.txt</div>
+<div class="f-item" data-f="wallpaper.jpg">🖼️ wallpaper.jpg</div>
+<div class="f-item" data-f="flag.txt">🚩 flag.txt</div>
+<div class="f-item" data-f="readme.md">📄 readme.md</div>
+<div id="files-msg" class="dim-text" style="margin-top:12px"></div>`;
+
+const sudoContent = () => `
+<h3>⚠️ SYSTEM CHECK</h3>
+<p>Running: <span class="blue-text">sudo rm -rf /</span></p>
+<p>Result: <span class="green-text">100% - Nothing happened. Nice try! 😉</span></p>
+<p class="dim-text">(Is portfolio me aapka data safe hai)</p>`;
+
+const hackerContent = () => `<div class="hack-out" id="hack-out"></div><div class="term-in"><span class="prompt">anonymous@darknet:~$</span><span class="dim-text">(koi bhi key dabao...)</span></div>`;
+
+const terminalContent = () => `
+<div class="term">
+    <div class="term-out"></div>
+    <div class="term-in">
+        <span class="prompt">root@kali:~#</span>
+        <input class="term-cmd" autocomplete="off" spellcheck="false">
+    </div>
+</div>`;
+
+const APPS = {
+    terminal:    { name:"Terminal",     icon:"🖥️", w:680, h:460, content:terminalContent, onOpen:startTerminal, term:true },
+    about:       { name:"About Me",     icon:"👤", w:420, h:300, content:aboutContent },
+    skills:      { name:"Skills",       icon:"⚡", w:440, h:360, content:skillsContent },
+    projects:    { name:"Projects",     icon:"🛠️", w:460, h:340, content:projectsContent },
+    contact:     { name:"Contact",      icon:"✉️", w:420, h:280, content:contactContent },
+    files:       { name:"Files",        icon:"📁", w:400, h:320, content:filesContent, onOpen:startFiles },
+    hackertyper: { name:"Hacker Typer", icon:"⌨️", w:540, h:320, content:hackerContent, onOpen:startHacker },
+    sudo:        { name:"sudo rm -rf /",icon:"☠️", w:400, h:240, content:sudoContent }
+};
+
+// ==================== WINDOW MANAGER ====================
+let zTop = 10;
+const openWins = {};
+
+function focusWin(win){
+    zTop++; win.style.zIndex = zTop;
+    document.querySelectorAll('#tasks button').forEach(b => b.classList.remove('active'));
+    const tb = document.querySelector(`#tasks button[data-app="${win.dataset.app}"]`);
+    if(tb) tb.classList.add('active');
+}
+function openApp(id){
+    const cfg = APPS[id];
+    if(!cfg) return;
+    if(openWins[id]){
+        const w = openWins[id];
+        w.style.display = 'flex';
+        focusWin(w);
+        return;
+    }
+    const win = document.createElement('div');
+    win.className = 'window'; win.dataset.app = id; win.tabIndex = 0;
+    win.style.width = cfg.w+'px'; win.style.height = cfg.h+'px';
+    const n = Object.keys(openWins).length;
+    win.style.left = (70 + (n%6)*45) + 'px';
+    win.style.top  = (50 + (n%6)*35) + 'px';
+    win.innerHTML = `
+        <div class="titlebar">
+            <span class="title">${cfg.icon} ${cfg.name}</span>
+            <button class="btn min" title="Minimize">–</button>
+            <button class="btn close" title="Close">✕</button>
+        </div>
+        <div class="content${cfg.term ? ' term-content' : ''}">${cfg.content()}</div>`;
+    document.getElementById('windows').appendChild(win);
+    openWins[id] = win;
+
+    const tb = document.createElement('button');
+    tb.textContent = cfg.name; tb.dataset.app = id;
+    tb.addEventListener('click', () => toggleWin(id));
+    document.getElementById('tasks').appendChild(tb);
+
+    win.querySelector('.close').addEventListener('click', () => closeApp(id));
+    win.querySelector('.min').addEventListener('click', () => { win.style.display='none'; tb.classList.remove('active'); });
+    makeDraggable(win, win.querySelector('.titlebar'));
+    win.addEventListener('mousedown', () => focusWin(win));
+    tb.classList.add('active');
+    focusWin(win);
+    if(cfg.onOpen) cfg.onOpen(win);
+}
+function closeApp(id){
+    const win = openWins[id];
+    if(win) win.remove();
+    delete openWins[id];
+    const tb = document.querySelector(`#tasks button[data-app="${id}"]`);
+    if(tb) tb.remove();
+}
+function toggleWin(id){
+    const win = openWins[id];
+    if(!win) return;
+    if(win.style.display === 'none'){ win.style.display='flex'; focusWin(win); }
+    else { win.style.display='none'; }
+}
+function makeDraggable(win, bar){
+    let sx, sy, ox, oy, drag = false;
+    bar.addEventListener('pointerdown', e => {
+        drag = true; sx = e.clientX; sy = e.clientY;
+        const r = win.getBoundingClientRect(); ox = r.left; oy = r.top;
+        bar.setPointerCapture(e.pointerId);
+        e.preventDefault();
+    });
+    bar.addEventListener('pointermove', e => {
+        if(!drag) return;
+        win.style.left = (ox + e.clientX - sx) + 'px';
+        win.style.top  = (oy + e.clientY - sy) + 'px';
+    });
+    bar.addEventListener('pointerup', () => { drag = false; });
+}
+
+document.querySelectorAll('.icon').forEach(ic => {
+    ic.addEventListener('click', () => openApp(ic.dataset.app));
+});
+
+// Start menu
+const sm = document.getElementById('startmenu');
+document.getElementById('start').addEventListener('click', e => {
+    e.stopPropagation();
+    sm.style.display = sm.style.display === 'block' ? 'none' : 'block';
+});
+sm.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    openApp(b.dataset.app); sm.style.display = 'none';
+}));
+document.addEventListener('click', () => sm.style.display = 'none');
+
+// Clock
+function tick(){
+    const d = new Date();
+    document.getElementById('clock').textContent =
+        d.toLocaleDateString('hi-IN') + ' ' + d.toLocaleTimeString('hi-IN');
+}
+setInterval(tick, 1000); tick();
+
+// ==================== FILES APP ====================
+function startFiles(win){
+    win.querySelectorAll('.f-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const msg = win.querySelector('#files-msg');
+            const f = item.dataset.f;
+            if(f === 'flag.txt') msg.innerHTML = '<span class="green-text">🏁 flag{you_found_me}</span>';
+            else if(f === 'readme.md') msg.innerHTML = '<span class="blue-text"># Portfolio<br>Type "help" in Terminal 😎</span>';
+            else msg.innerHTML = '<span class="red-text">Permission denied (EACCES) - root bhi ro sakta hai 🤷</span>';
+        });
+    });
+}
+
+// ==================== HACKER TYPER ====================
+function startHacker(win){
+    const out = win.querySelector('#hack-out');
+    const words = ["root@kali","exploit","payload","0x00","0xFF","sudo","nmap","hydra","metasploit","buffer_overflow","reverse_shell","wireshark","crack","bypass","inject","$HOME","/dev/null","nc -lvp 4444","GET /admin","401","200 OK","ACCESS_DENIED","brute_force","kerberoast","lateral_movement","privesc","rooted!"];
+    win.addEventListener('keydown', function hk(e){
+        if(win.style.display === 'none') return;
+        const chunk = Array.from({length: 3 + Math.floor(Math.random()*8)},
+            () => words[Math.floor(Math.random()*words.length)]).join(' ');
+        out.textContent += ' ' + chunk;
+        out.scrollTop = out.scrollHeight;
+    });
+}
+
+// ==================== TERMINAL ====================
+const COMMANDS = {
+    "help": { desc:"Available commands dikhata hai", run(t){
+        t.print("<span class='highlight'>Available Commands:</span><br>");
+        for(const [c,i] of Object.entries(COMMANDS))
+            t.print(`  <span class='blue-text'>${c.padEnd(14)}</span> ${i.desc}`);
+        t.print("<br><span class='dim-text'>Tip: Tab = autocomplete, Up/Down = history</span>");
+    }},
+    "whoami": { desc:"Naam aur role dikhata hai", run(t){ t.print(`${MY_NAME} - ${MY_ROLE}`); }},
+    "about": { desc:"Mere baare mein", run(t){
+        t.print("<span class='highlight'>=== ABOUT ME ===</span><br>");
+        t.print(`Hi! Main <span class='pink-text'>${MY_NAME}</span> hoon, ek passionate security researcher.`);
+        t.print("Penetration testing, network security aur ethical hacking me");
+        t.print("apni skills continuously improve kar raha hoon.<br>");
+        t.print(`Location: ${MY_LOCATION}`);
+        t.print("Interests: Hacking, CTF, Bug Bounty, Open Source");
+    }},
+    "skills": { desc:"Skills list karta hai", run(t){
+        t.print("<span class='highlight'>=== SKILLS ===</span><br>");
+        MY_SKILLS.forEach(s => t.print(`  <span class='blue-text'>[+]</span> ${s}`));
+    }},
+    "projects": { desc:"Projects dikhata hai", run(t){
+        t.print("<span class='highlight'>=== PROJECTS ===</span><br>");
+        MY_PROJECTS.forEach((p,i) => t.print(`  <span class='green-text'>[${i+1}]</span> ${p}`));
+    }},
+    "certs": { desc:"Certifications dikhata hai", run(t){
+        t.print("<span class='highlight'>=== CERTIFICATIONS ===</span><br>");
+        MY_CERTS.forEach(c => t.print(`  <span class='green-text'>[*]</span> ${c}`));
+    }},
+    "contact": { desc:"Contact details", run(t){
+        t.print("<span class='highlight'>=== CONTACT ===</span><br>");
+        t.print(`  Email:    <span class='blue-text'>${MY_EMAIL}</span>`);
+        t.print(`  GitHub:   <span class='blue-text'>${MY_GITHUB}</span>`);
+        t.print(`  LinkedIn: <span class='blue-text'>${MY_LINKEDIN}</span>`);
+    }},
+    "neofetch": { desc:"System info (ASCII art)", run(t){
+        const nf = [
+"        ▄▄▄▄▄▄▄▄▄▄▄        <span class='pink-text'>root@kali</span>",
+"      ▄█████████████▄      <span class='dim-text'>-------------</span>",
+"    ▄███▓▓▓▓▓▓▓▓▓███▄     <span class='blue-text'>OS:</span>       Kali Portfolio 2026.1",
+"  ▄███▓▓▓▓▓▓▓▓▓▓▓▓███▄   <span class='blue-text'>Host:</span>     My Portfolio Machine",
+"▄███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███▄  <span class='blue-text'>Kernel:</span>   6.6.0-kali1-amd64",
+"███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███  <span class='blue-text'>Uptime:</span>   Always On",
+"███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███  <span class='blue-text'>Shell:</span>    bash 5.2.15",
+"███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███  <span class='blue-text'>DE:</span>       Portfolio Desktop",
+"▀███▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓███▀  <span class='blue-text'>WM:</span>       HackerWM",
+"  ▀███▓▓▓▓▓▓▓▓▓▓▓▓███▀   <span class='blue-text'>CPU:</span>      Your Brain (∞ cores)",
+"    ▀███▓▓▓▓▓▓▓▓▓███▀    <span class='blue-text'>Memory:</span>   Unlimited",
+"      ▀█████████████▀     <span class='blue-text'>Name:</span>     ${MY_NAME}",
+"        ▀▀▀▀▀▀▀▀▀▀▀"
+        ].join("\n");
+        t.print(`<span class='ascii'>${nf}</span>`);
+    }},
+    "ls": { desc:"Files dikhata hai", run(t){
+        t.print("<span class='dim-text'>total 24</span>");
+        t.print("<span class='blue-text'>drwxr-xr-x</span> root root  4096 Jul 21 10:00 <span class='blue-text'>projects/</span>");
+        t.print("<span class='blue-text'>-rw-r--r--</span> root root   512 Jul 21 10:00 skills.txt");
+        t.print("<span class='blue-text'>-rw-r--r--</span> root root   256 Jul 21 10:00 contact.md");
+        t.print("<span class='blue-text'>-rwxr-xr-x</span> root root  1024 Jul 21 10:00 about.sh");
+        t.print("<span class='blue-text'>-rw-r--r--</span> root root    13 Jul 21 10:00 flag.txt");
+        t.print("<br><span class='dim-text'>Try: cat flag.txt</span>");
+    }},
+    "cat": { desc:"File content dikhata hai (cat flag.txt)", run(t, arg){
+        if(arg === 'flag.txt') t.print("<span class='green-text'>🏁 flag{portfolio_complete}</span>");
+        else if(arg === 'skills.txt') MY_SKILLS.forEach(s => t.print(`  <span class='blue-text'>[+]</span> ${s}`));
+        else if(arg === 'about.sh') t.print("<span class='dim-text'>#!/bin/bash<br>echo 'Main ek security researcher hoon!'</span>");
+        else if(arg === 'contact.md') t.print(`# Contact\n${MY_EMAIL}\n${MY_GITHUB}`);
+        else t.print(`<span class='red-text'>cat: ${arg || '??? '}: No such file or directory</span>`);
+    }},
+    "hack": { desc:"Hacking simulation", run(t){
+        const steps = ["Initializing exploit...","Bypassing firewall...","Injecting payload...","Brute forcing password...","Accessing root shell..."];
+        steps.forEach((s,i) => setTimeout(() => {
+            t.print(`<span class='dim-text'>[${'■'.repeat(i+1)}${'□'.repeat(4-i)}]</span> ${s}`);
+        }, i*500));
+        setTimeout(() => t.print("<span class='green-text'>ACCESS GRANTED - Welcome to the matrix, root. 😎</span>"), steps.length*500+300);
+    }},
+    "banner": { desc:"ASCII banner dobara", run(t){ t.print(`<span class='ascii'>${BANNER}</span>`); }},
+    "date": { desc:"Aaj ki date/time", run(t){ t.print(new Date().toString()); }},
+    "clear": { desc:"Terminal clear karta hai", run(t){ t.clear(); }},
+    "exit": { desc:"Terminal band karta hai", run(t){
+        t.print("<span class='dim-text'>logout</span>");
+        setTimeout(() => closeApp('terminal'), 400);
+    }},
+    "sudo": { desc:"Joke 😄", run(t){
+        t.print("<span class='red-text'>Nice try! Is portfolio me sudo nahi chalta. 😄</span>");
+        t.print("<span class='dim-text'>(Aap already root ho!)</span>");
+    }}
+};
+
+function startTerminal(win){
+    const out = win.querySelector('.term-out');
+    const input = win.querySelector('.term-cmd');
+    const promptEl = win.querySelector('.prompt');
+    const t = {
+        print(text){ const d = document.createElement('div'); d.innerHTML = text; out.appendChild(d); out.scrollTop = out.scrollHeight; },
+        clear(){ out.innerHTML = ''; }
+    };
+    let hist = [], hi = -1;
+
+    t.print(`<span class='ascii'>${BANNER}</span>`);
+    t.print("<span class='highlight'>Welcome to my terminal portfolio!</span>");
+    t.print("Type <span class='blue-text'>help</span> ya <span class='blue-text'>neofetch</span> shuru karne ke liye.<br>");
+
+    input.addEventListener('keydown', e => {
+        if(e.key === 'Enter'){
+            const cmd = input.value.trim().toLowerCase();
+            t.print(`${promptEl.textContent} ${input.value}`);
+            input.value = '';
+            if(cmd){
+                hist.push(cmd); hi = hist.length;
+                const parts = cmd.split(/\s+/);
+                const base = parts[0], arg = parts.slice(1).join(' ');
+                if(COMMANDS[base]) COMMANDS[base].run(t, arg);
+                else t.print(`<span class='red-text'>bash: ${base}: command not found</span>`);
+            }
+            t.print('');
+        } else if(e.key === 'ArrowUp'){
+            e.preventDefault();
+            if(hi > 0){ hi--; input.value = hist[hi]; }
+        } else if(e.key === 'ArrowDown'){
+            e.preventDefault();
+            if(hi < hist.length-1){ hi++; input.value = hist[hi]; }
+            else { hi = hist.length; input.value = ''; }
+        } else if(e.key === 'Tab'){
+            e.preventDefault();
+            const partial = input.value.toLowerCase();
+            const matches = Object.keys(COMMANDS).filter(c => c.startsWith(partial));
+            if(matches.length === 1) input.value = matches[0];
+            else if(matches.length > 1) t.print('  ' + matches.join('  '));
+        }
+    });
+    setTimeout(() => input.focus(), 100);
+}
+</script>
+</body>
+</html>
